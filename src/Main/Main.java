@@ -3,6 +3,8 @@ package Main;
 import javax.swing.JFrame;
 
 import Engine.GamePanel;
+import MapEditor.MapEditor;
+import Tile.TileManager;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -20,5 +22,8 @@ public class Main {
         window.setVisible(true);
 
         gamePanel.startGameThread();
+
+        // MapEditor mapEditor = new MapEditor();
+        // mapEditor.run(gamePanel.getTileManager().getTiles());
     }
 }

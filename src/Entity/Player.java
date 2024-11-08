@@ -6,10 +6,9 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import java.awt.Color;
-
 import Engine.GamePanel;
 import Engine.KeyHandler;
+import Utils.ImageUtils;
 
 public class Player extends Entity {
 
@@ -17,23 +16,23 @@ public class Player extends Entity {
     private KeyHandler keyH;
     private boolean isItStaying = true;
 
+    private final int screenX;
+    private final int screenY;
 
     public Player(int x, int y, int speed, GamePanel gamePanel, KeyHandler keyH) {
-        super(x, y, gamePanel.getTileSize(), gamePanel.getTileSize(), speed);
+        super(x, y, gamePanel.getTileSize()  * 2, gamePanel.getTileSize()  * 2, speed);
 
         this.gamePanel = gamePanel;
         this.keyH = keyH;
+
+        this.screenX = gamePanel.getScreenWidth() / 2 - (gamePanel.getTileSize() / 2);
+        this.screenY = gamePanel.getScreenHeight() / 2 - (gamePanel.getTileSize() / 2);
 
         getPlayerImage();
     }
 
     public Player(GamePanel gamePanel, KeyHandler keyH) {
-        super(100, 100, gamePanel.getTileSize(), gamePanel.getTileSize(), 4);
-
-        this.gamePanel = gamePanel;
-        this.keyH = keyH;
-
-        getPlayerImage();
+        this(gamePanel.getTileSize() * 24, gamePanel.getTileSize() * 24,5, gamePanel, keyH);
     }
 
     public void getPlayerImage() {
@@ -68,59 +67,73 @@ public class Player extends Entity {
         }
 
         increaseSpriteCounter();
-            if (getSpriteCounter() > 8) {
-                nextAnimation(6);
-                setSpriteCounter(0);
-            }
+        if (getSpriteCounter() > 8) {
+            nextAnimation(6);
+            setSpriteCounter(0);
+        }
     }
 
     public void draw(Graphics2D g2) {
-        // g2.setColor(Color.WHITE);
-        // g2.fillRect(getX(), getY(), getWidth(), getWidth());
-
         BufferedImage image = null;
         BufferedImage spriteSheet = getMoveSpriteSheet();
 
         if (isItStaying) {
             switch (getDirection()) {
                 case "up":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 2, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 2,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
                     break;
                 case "down":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 0, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 0,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
                     break;
                 case "left":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 3, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 1,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
+                    image = ImageUtils.flipImageHorizontally(image);
                     break;
                 case "right":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 1, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 1,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
                     break;
             }
         } else {
             switch (getDirection()) {
                 case "up":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 6, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 5,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
                     break;
                 case "down":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 4, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 3,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
                     break;
                 case "left":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 7, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 4,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
+                    image = ImageUtils.flipImageHorizontally(image);
                     break;
                 case "right":
-                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 5, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    image = spriteSheet.getSubimage(32 * getCurrentAnimation(), 32 * 4,
+                            gamePanel.getOriginalTileSize() * 2,
+                            gamePanel.getOriginalTileSize() * 2);
                     break;
             }
         }
+        g2.drawImage(image, screenX, screenY, getWidth(), getHeight(), null);
+    }
+    
+    public int getScreenX() {
+        return screenX;
+    }
 
-        g2.drawImage(image, getX(), getY(), getWidth(), getHeight(), null);
+    public int getScreenY() {
+        return screenY;
     }
 }

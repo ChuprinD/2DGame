@@ -3,20 +3,20 @@ package Entity;
 import java.awt.image.BufferedImage;
 
 public class Entity {
-    private int x;
-    private int y;
+    private int worldX;
+    private int worldY;
     private int width;
     private int height;
     private int speed;
     private String direction;
 
     private BufferedImage moveSpriteSheet;
-    private int currentAnmation = 0;
+    private int currentAnimation = 0;
     private int spriteCounter = 0;
 
     public Entity(int x, int y, int width, int height, int speed) {
-        this.x = x;
-        this.y = y;
+        this.worldX = x;
+        this.worldY = y;
         this.width = width;
         this.height = height;
         this.speed = speed;
@@ -44,11 +44,11 @@ public class Entity {
     }
 
     public int getCurrentAnimation() {
-        return currentAnmation;
+        return currentAnimation;
     }
 
     public void nextAnimation(int maxAnimation) {
-        currentAnmation = (currentAnmation + 1) % maxAnimation;
+        currentAnimation = (currentAnimation + 1) % maxAnimation;
     }
 
     public void setDirection(String direction) {
@@ -60,27 +60,27 @@ public class Entity {
     }
 
     public void moveUp() {
-        y -= speed;
+        worldY -= speed;
     }
 
     public void moveDown() {
-        y += speed;
+        worldY += speed;
     }
 
     public void moveLeft() {
-        x -= speed;
+        worldX -= speed;
     }
 
     public void moveRight() {   
-        x += speed;
+        worldX += speed;
     }
 
-    public int getX() {
-        return x;
+    public int getWorldX() {
+        return worldX;
     }
 
-    public int getY() {
-        return y;
+    public int getWorldY() {
+        return worldY;
     }
 
     public int getWidth() {
