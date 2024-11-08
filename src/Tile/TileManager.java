@@ -24,43 +24,45 @@ public class TileManager {
 
         this.tiles = new HashMap<>();
         this.mapTileNum = new int[gamePanel.getMaxWorldCol()][gamePanel.getMaxWorldRow()];
-        loadTilesImages();
-        loadMap("Map02");
+        loadTilesImages(gamePanel.getOriginalTileSize());
+        loadMap("world2");
+    }
+
+    public TileManager(int originalTileSize, int maxWorldCol, int maxWorldRow) {
+        this.tiles = new HashMap<>();
+        this.mapTileNum = new int[maxWorldCol][maxWorldRow];
+        loadTilesImages(originalTileSize);
     }
 
     public Map<Integer, Tile> getTiles() {
         return tiles;
     }
 
-    public void loadTilesImages() {
+    public void loadTilesImages(int originalTileSize) {
         try {
-            BufferedImage imageGrass = ImageIO
-                    .read(getClass().getResourceAsStream("/resources/Tiles/Grass_Middle.png"));
-            tiles.put(0, new Tile(imageGrass, false));
-
             BufferedImage imageWater = ImageIO
-                    .read(getClass().getResourceAsStream("/resources/Tiles/Water_Middle.png"));
-            tiles.put(1, new Tile(imageWater, true));
-
-            BufferedImage imageShore = ImageIO
                     .read(getClass().getResourceAsStream("/resources/Tiles/Water_Tile.png"));
 
-            int tileId = 2;
+            int tileId = 0;
             int rows = 6;  
             int columns = 3; 
 
             for (int row = 0; row < rows; row++) {
                 for (int col = 0; col < columns; col++) {
-                    if (row == 1 && col == 1)
-                        continue;
-
                     if ((row == 3 || row == 4) && col > 1)
                         continue;
 
-                    BufferedImage tileImage = imageShore.getSubimage(gamePanel.getOriginalTileSize() * col,
-                            gamePanel.getOriginalTileSize() * row, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
+                    BufferedImage tileImage = imageWater.getSubimage(originalTileSize * col, originalTileSize * row,
+                            originalTileSize, originalTileSize);
+
                     tiles.put(tileId, new Tile(tileImage, true));
+                    
+                    // if ((row == 1 && col == 1) || row == 5) {
+                    //     tiles.put(tileId, new Tile(tileImage, true));
+                    // } else {
+                    //     tiles.put(tileId, new Tile(tileImage, false));
+                    // }
+                    
                     tileId++;
                 }
             }
@@ -75,10 +77,47 @@ public class TileManager {
                     if ((row == 3 || row == 4) && col > 1)
                         continue;
 
-                    BufferedImage tileImage = imagePath.getSubimage(gamePanel.getOriginalTileSize() * col,
-                            gamePanel.getOriginalTileSize() * row, gamePanel.getOriginalTileSize(),
-                            gamePanel.getOriginalTileSize());
-                    tiles.put(tileId, new Tile(tileImage, true));
+                    BufferedImage tileImage = imagePath.getSubimage(originalTileSize * col, originalTileSize * row,
+                            originalTileSize, originalTileSize);
+                    tiles.put(tileId, new Tile(tileImage, false));
+                    tileId++;
+                }
+            }
+
+            BufferedImage imageCliff = ImageIO.read(getClass().getResourceAsStream("/resources/Tiles/Cliff_Tile.png"));
+            
+            rows = 6;  
+            columns = 3; 
+
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < columns; col++) {
+                    if ((row == 3 || row == 4) && col > 1)
+                        continue;
+
+                    BufferedImage tileImage = imageCliff.getSubimage(originalTileSize * col, originalTileSize * row,
+                            originalTileSize, originalTileSize);
+                    if ((row == 1 && col == 1) || row == 5) {
+                        tiles.put(tileId, new Tile(tileImage, false));
+                    } else {
+                        tiles.put(tileId, new Tile(tileImage, true));
+                    }
+                    
+                    tileId++;
+                }
+            }
+            
+            BufferedImage imageBeach = ImageIO.read(getClass().getResourceAsStream("/resources/Tiles/Beach_Tile.png"));
+            
+            rows = 3;  
+            columns = 5; 
+
+            for (int row = 0; row < rows; row++) {
+                for (int col = 0; col < columns; col++) {
+                    if (row == 2 && col > 2)
+                        continue;
+
+                    BufferedImage tileImage = imageBeach.getSubimage(originalTileSize * col, originalTileSize * row, originalTileSize, originalTileSize);
+                    tiles.put(tileId, new Tile(tileImage, false));
                     tileId++;
                 }
             }
@@ -133,14 +172,21 @@ public class TileManager {
             int screenX = worldX - gamePanel.getPlayer().getWorldX() + gamePanel.getPlayer().getScreenX();
             int screenY = worldY - gamePanel.getPlayer().getWorldY() + gamePanel.getPlayer().getScreenY();
 
-            if (worldX + gamePanel.getTileSize() > gamePanel.getPlayer().getWorldX() - gamePanel.getPlayer().getScreenX() && 
-                worldX - gamePanel.getTileSize() < gamePanel.getPlayer().getWorldX() + gamePanel.getPlayer().getScreenX() && 
-                worldY + gamePanel.getTileSize() > gamePanel.getPlayer().getWorldY() - gamePanel.getPlayer().getScreenY() && 
-                worldY - gamePanel.getTileSize() < gamePanel.getPlayer().getWorldY() + gamePanel.getPlayer().getScreenY()) {
-                    
-                    g2.drawImage(tiles.get(tileNum).getImage(), screenX, screenY, gamePanel.getTileSize(), gamePanel.getTileSize(), null); 
+            if (worldX
+                    + gamePanel.getTileSize() > gamePanel.getPlayer().getWorldX() - gamePanel.getPlayer().getScreenX()
+                    &&
+                    worldX - gamePanel.getTileSize() < gamePanel.getPlayer().getWorldX()
+                            + gamePanel.getPlayer().getScreenX()
+                    &&
+                    worldY + gamePanel.getTileSize() > gamePanel.getPlayer().getWorldY()
+                            - gamePanel.getPlayer().getScreenY()
+                    &&
+                    worldY - gamePanel.getTileSize() < gamePanel.getPlayer().getWorldY()
+                            + gamePanel.getPlayer().getScreenY()) {
+
+                g2.drawImage(tiles.get(tileNum).getImage(), screenX, screenY, gamePanel.getTileSize(),
+                        gamePanel.getTileSize(), null);
             }
-            
 
             currentCol++;
 
@@ -149,5 +195,9 @@ public class TileManager {
                 currentRow++;
             }
         }
+    }
+    
+    public int[][] getMapTileNum() {
+        return mapTileNum;
     }
 }

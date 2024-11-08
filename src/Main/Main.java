@@ -8,6 +8,7 @@ import Tile.TileManager;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setResizable(false);
@@ -24,6 +25,6 @@ public class Main {
         gamePanel.startGameThread();
 
         // MapEditor mapEditor = new MapEditor();
-        // mapEditor.run(gamePanel.getTileManager().getTiles());
+        // mapEditor.run();
     }
 }

@@ -7,6 +7,7 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
+import Entity.CollisionChecker;
 import Entity.Player;
 import Tile.TileManager;
 
@@ -29,6 +30,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     private Thread gameThread;
     private KeyHandler keyH = new KeyHandler();
+
+    private CollisionChecker collisionChecker = new CollisionChecker(this);
 
     private Player player;
     private TileManager tileManager;
@@ -145,5 +148,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     public KeyHandler getKeyHandler() {
         return keyH;
+    }
+
+    public CollisionChecker getCollisionChecker() {
+        return collisionChecker;
     }
 }

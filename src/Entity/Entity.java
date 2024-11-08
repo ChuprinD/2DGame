@@ -1,5 +1,6 @@
 package Entity;
 
+import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public class Entity {
@@ -14,13 +15,17 @@ public class Entity {
     private int currentAnimation = 0;
     private int spriteCounter = 0;
 
-    public Entity(int x, int y, int width, int height, int speed) {
+    private Rectangle solidArea;
+    private boolean collisionOn = false;
+
+    public Entity(int x, int y, int width, int height, int speed, Rectangle solidArea) {
         this.worldX = x;
         this.worldY = y;
         this.width = width;
         this.height = height;
         this.speed = speed;
         this.direction = "down";
+        this.solidArea = solidArea;
     }
 
     public void setMoveSpriteSheet(BufferedImage moveSpriteSheet) {
@@ -93,5 +98,17 @@ public class Entity {
 
     public int getSpeed() {
         return speed;
+    }
+
+    public void setCollisionOn(boolean collisionOn) {
+        this.collisionOn = collisionOn;
+    }
+
+    public Rectangle getSolidArea() {
+        return solidArea;
+    }
+
+    public boolean isCollisionOn() {
+        return collisionOn;
     }
 }
