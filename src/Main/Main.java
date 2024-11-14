@@ -4,7 +4,6 @@ import javax.swing.JFrame;
 
 import Engine.GamePanel;
 import MapEditor.MapEditor;
-import Tile.TileManager;
 
 public class Main {
     public static void main(String[] args) throws Exception {
@@ -20,11 +19,12 @@ public class Main {
         window.pack();
 
         window.setLocationRelativeTo(null);
-        window.setVisible(true);
+        //window.setVisible(true);
 
-        gamePanel.startGameThread();
+        //gamePanel.setupGame();
+        //gamePanel.startGameThread();
 
-        // MapEditor mapEditor = new MapEditor();
-        // mapEditor.run();
+        MapEditor mapEditor = new MapEditor();
+        mapEditor.run();
     }
 }

@@ -1,4 +1,4 @@
-package Entity;
+package Assets.Entity;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -7,21 +7,29 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import Assets.Object.SuperObject;
 import Engine.GamePanel;
 import Engine.KeyHandler;
 import Utils.ImageUtils;
+import Assets.Object.Chest;
 
 public class Player extends Entity {
 
     private GamePanel gamePanel;
     private KeyHandler keyH;
     private boolean isItStaying = true;
+    private int hasKey = 0;
 
-    private final int screenX;
-    private final int screenY;
+    private final int screenX, screenY;
 
     public Player(int x, int y, int speed, GamePanel gamePanel, KeyHandler keyH) {
-        super(x, y, gamePanel.getTileSize()  * 2, gamePanel.getTileSize()  * 2, speed, new Rectangle(11 * gamePanel.getScale(), 12 * gamePanel.getScale(), 9 * gamePanel.getScale(), 9 * gamePanel.getScale()));
+        super(x, y, gamePanel.getTileSize() * 2, gamePanel.getTileSize() * 2, speed);
+        
+        Rectangle solidArea = new Rectangle(11 * gamePanel.getScale(), 12 * gamePanel.getScale(),
+                9 * gamePanel.getScale(), 9 * gamePanel.getScale());
+
+        setSolidArea(solidArea);
+        setdefaultSolidArea(solidArea.x, solidArea.y);
 
         this.gamePanel = gamePanel;
         this.keyH = keyH;
@@ -46,7 +54,7 @@ public class Player extends Entity {
         }
     }
 
-    public void update(){
+    public void update() {
         if (keyH.isUpPressed()) {
             setDirection("up");
         } else if (keyH.isDownPressed()) {
@@ -59,7 +67,9 @@ public class Player extends Entity {
 
         setCollisionOn(false);
         gamePanel.getCollisionChecker().checkTile(this);
-        
+        int objectIndex = gamePanel.getCollisionChecker().checkObject(this, true);
+        pickUpObject(objectIndex);
+
         if (keyH.isUpPressed() || keyH.isDownPressed() || keyH.isLeftPressed() || keyH.isRightPressed()) {
             isItStaying = false;
             if (isCollisionOn() == false) {
@@ -86,6 +96,28 @@ public class Player extends Entity {
         if (getSpriteCounter() > 8) {
             nextAnimation(6);
             setSpriteCounter(0);
+        }
+    }
+    
+    public void pickUpObject(int objectIndex) {
+        if (objectIndex != -1) {
+            String objectName = gamePanel.getObjects()[objectIndex].getName();
+
+            switch (objectName) {
+                case "key":
+                    hasKey++;
+                    gamePanel.getObjects()[objectIndex] = null;
+                    break;
+            
+                case "chest":
+                    if (hasKey > 0 && keyH.isInteractPressed()) {
+                        hasKey--;
+                        ((Chest) gamePanel.getObjects()[objectIndex]).openChest();
+                    }
+                    break;
+            }
+            
+            
         }
     }
 

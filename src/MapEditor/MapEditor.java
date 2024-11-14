@@ -1,190 +1,106 @@
 package MapEditor;
 
 import javax.swing.*;
-import Tile.Tile;
+import Engine.GamePanel;
 import Tile.TileManager;
-
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.Map;
-import java.util.Scanner;
 
 public class MapEditor extends JFrame {
-    private final int originalTileSize = 16;
-
-    private final int maxWorldCol = 50;
-    private final int maxWorldRow = 50;
-
-    private final JButton[][] gridButtons = new JButton[maxWorldRow][maxWorldCol];
-    private BufferedImage selectedSprite;
-    private Integer selectedSpriteId = -1;  
-    private final Integer[][] mapData = new Integer[maxWorldRow][maxWorldCol];
+    private GamePanel gamePanel;
+    private MapPanel mapPanel;
+    private SpritePanel spritePanel;
+    private MapController mapController;
+    private FileManager fileManager;
+    private JTextField rowsField;
+    private JTextField colsField;
+    private int maxWorldCol = 50;
+    private int maxWorldRow = 50;
+    private int currentTileSize;
 
     public void run() {
+        setTitle("Map Editor");
+        setLayout(new BorderLayout());
+        setLocationRelativeTo(null);
 
-        Map<Integer, Tile> tiles = new TileManager(this.originalTileSize, this.maxWorldCol, this.maxWorldRow).getTiles();
-        this.setTitle("Map Editor");
-        this.setLayout(new BorderLayout());
+        initializeComponents();
 
-        setUpGrid();
+        mapController.initializeMap();
+        mapPanel.setMapData(mapController.getMapData());
+        fileManager.setMapPanel(mapPanel);
+        setUpTopPanel();
 
-        setUpSpritePanel(tiles);
-
-        JButton saveButton = new JButton("Save Map");
-        saveButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String fileName = JOptionPane.showInputDialog("Enter file name to save:");
-                if (fileName != null && !fileName.trim().isEmpty()) {
-                    saveMapToFile(fileName.trim());
-                }
-            }
-        });
-
-        JButton loadButton = new JButton("Load Map");
-        loadButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String fileName = JOptionPane.showInputDialog("Enter file name to load:");
-                if (fileName != null && !fileName.trim().isEmpty()) {
-                    loadMapFromFile(fileName.trim(), tiles);
-                }
-            }
-        });
-
-        JPanel topPanel = new JPanel();
-        topPanel.add(saveButton);
-        topPanel.add(loadButton);
-        this.add(topPanel, BorderLayout.NORTH);
-
-        this.pack();
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        this.setVisible(true);
-    }
-
-    private void saveMapToFile(String fileName) {
-        try (FileWriter writer = new FileWriter("src/resources/maps/" + fileName + ".txt")) {
-            for (int y = 0; y < maxWorldRow; y++) {
-                StringBuilder line = new StringBuilder();
-                for (int x = 0; x < maxWorldCol; x++) {
-                    line.append(mapData[y][x]).append(" "); 
-                }
-                writer.write(line.toString().trim() + "\n"); 
-            }
-            JOptionPane.showMessageDialog(this, "Map saved successfully!");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error saving the map.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void loadMapFromFile(String fileName, Map<Integer, Tile> tiles) {
-        try {
-            Scanner scanner = new Scanner(new File("src/resources/maps/" + fileName + ".txt"));
-            for (int y = 0; y < maxWorldRow; y++) {
-                if (!scanner.hasNextLine())
-                    break;
-                String[] line = scanner.nextLine().trim().split(" ");
-                for (int x = 0; x < maxWorldCol; x++) {
-                    int tileId = Integer.parseInt(line[x]);
-                    mapData[y][x] = tileId;
-
-                    if (tileId != -1 && tiles.containsKey(tileId)) {
-                        gridButtons[y][x].setIcon(new ImageIcon(tiles.get(tileId).getImage()
-                                .getScaledInstance(originalTileSize, originalTileSize, Image.SCALE_SMOOTH)));
-                    } else {
-                        gridButtons[y][x].setIcon(null);
-                    }
-                }
-            }
-            scanner.close();
-            JOptionPane.showMessageDialog(this, "Map loaded successfully!");
-        } catch (IOException ex) {
-            ex.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error loading the map.", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    private void setUpGrid() {
-        for (int y = 0; y < maxWorldRow; y++) {
-            for (int x = 0; x < maxWorldCol; x++) {
-                mapData[y][x] = -1;
-            }
-        }
-
-        JPanel gridPanel = new JPanel(new GridLayout(maxWorldRow, maxWorldCol));
-        for (int y = 0; y < maxWorldRow; y++) {
-            for (int x = 0; x < maxWorldCol; x++) {
-                JButton button = new JButton();
-                button.setPreferredSize(new Dimension(originalTileSize, originalTileSize));
-
-                final int finalX = x;
-                final int finalY = y;
-
-                button.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mousePressed(MouseEvent e) {
-                        if (SwingUtilities.isLeftMouseButton(e) && selectedSprite != null) {
-                            button.setIcon(new ImageIcon(selectedSprite));
-                            mapData[finalY][finalX] = selectedSpriteId;
-                        } else if (SwingUtilities.isRightMouseButton(e)) {
-                            button.setIcon(null);
-                            mapData[finalY][finalX] = -1;
-                        }
-                    }
-                });
-
-                gridButtons[y][x] = button;
-                gridPanel.add(button);
-            }
-        }
-        this.add(gridPanel, BorderLayout.CENTER);
-    }
-
-    private void setUpSpritePanel(Map<Integer, Tile> tiles) {
-        JPanel spritePanel = new JPanel();
-        spritePanel.setLayout(new BoxLayout(spritePanel, BoxLayout.X_AXIS));
-        for (int id = 0; id < tiles.size(); id++) {
-            final int spriteId = id;
-            System.out.println("\n" + id);
-            ImageIcon icon = new ImageIcon(tiles.get(id).getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH));
-            JButton spriteButton = new JButton(icon);
-            spriteButton.setPreferredSize(new Dimension(32, 32));
-
-            spriteButton.addActionListener(new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    selectedSprite = tiles.get(spriteId).getImage();
-                    selectedSpriteId = spriteId;
-                }
-            });
-            spritePanel.add(spriteButton);
-        }
+        add(mapPanel, BorderLayout.CENTER);
 
         JScrollPane spriteScrollPane = new JScrollPane(spritePanel);
         spriteScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         spriteScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
-        spriteScrollPane.setPreferredSize(new Dimension(500, 60));
+        spriteScrollPane.setPreferredSize(new Dimension(500, 80)); 
+        add(spriteScrollPane, BorderLayout.SOUTH);
 
-        this.add(spriteScrollPane, BorderLayout.SOUTH);
-    }
-    
-    public int getOriginalTileSize() {
-        return originalTileSize;
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        int width = screenSize.width / 3;
+        int height = screenSize.height * 2 / 3;
+
+        setSize(width, height);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        setLocationRelativeTo(null);
+        setVisible(true);
     }
 
-    public int getMaxScreenCol() {
-        return maxWorldCol;
+    private void initializeComponents() {
+        gamePanel = new GamePanel();
+        currentTileSize = gamePanel.getOriginalTileSize();
+        mapController = new MapController(maxWorldRow, maxWorldCol, currentTileSize, new TileManager(gamePanel).getTiles());
+        mapPanel = new MapPanel(mapController);
+        mapController.setMapPanel(mapPanel);
+        spritePanel = new SpritePanel(mapController);
+        fileManager = new FileManager(mapController, rowsField, colsField);
     }
 
-    public int getMaxScreenRow() {
-        return maxWorldRow;
+    private void setUpTopPanel() {
+        JPanel topPanel = new JPanel();
+        rowsField = new JTextField(String.valueOf(maxWorldRow), 3);
+        colsField = new JTextField(String.valueOf(maxWorldCol), 3);
+
+        fileManager.setColsField(colsField);
+        fileManager.setRowsField(rowsField);
+
+        JButton resizeButton = new JButton("Resize Map");
+        resizeButton.addActionListener(e -> resizeMap());
+
+        JButton saveButton = new JButton("Save Map");
+        saveButton.addActionListener(e -> fileManager.saveMap());
+
+        JButton loadButton = new JButton("Load Map");
+        loadButton.addActionListener(e -> fileManager.loadMap());
+
+        JButton undoButton = new JButton("Undo");
+        undoButton.addActionListener(e -> {
+            mapController.undo(); 
+            mapPanel.repaint();  
+        });
+
+        topPanel.add(new JLabel("Rows:"));
+        topPanel.add(rowsField);
+        topPanel.add(new JLabel("Columns:"));
+        topPanel.add(colsField);
+        topPanel.add(resizeButton);
+        topPanel.add(saveButton);
+        topPanel.add(loadButton);
+        topPanel.add(undoButton);
+
+        add(topPanel, BorderLayout.NORTH);
+    }
+
+    private void resizeMap() {
+        try {
+            maxWorldRow = Integer.parseInt(rowsField.getText());
+            maxWorldCol = Integer.parseInt(colsField.getText());
+            mapController.resizeMap(maxWorldRow, maxWorldCol);
+            mapPanel.repaint();
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Please enter valid integers for rows and columns.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }

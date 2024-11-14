@@ -7,8 +7,10 @@ import java.awt.Graphics2D;
 
 import javax.swing.JPanel;
 
-import Entity.CollisionChecker;
-import Entity.Player;
+import Assets.AssetSetter;
+import Assets.CollisionChecker;
+import Assets.Entity.Player;
+import Assets.Object.SuperObject;
 import Tile.TileManager;
 
 public class GamePanel extends JPanel implements Runnable {
@@ -32,9 +34,12 @@ public class GamePanel extends JPanel implements Runnable {
     private KeyHandler keyH = new KeyHandler();
 
     private CollisionChecker collisionChecker = new CollisionChecker(this);
+    private AssetSetter assetSetter = new AssetSetter(this);
 
     private Player player;
     private TileManager tileManager;
+
+    private SuperObject objects[] = new SuperObject[10];
 
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
@@ -45,7 +50,10 @@ public class GamePanel extends JPanel implements Runnable {
 
         tileManager = new TileManager(this);
         player = new Player(this, keyH);
+    }
 
+    public void setupGame() {
+        assetSetter.setObjects();
     }
 
     public TileManager getTileManager() {
@@ -80,6 +88,11 @@ public class GamePanel extends JPanel implements Runnable {
 
     public void update() {
         player.update();
+        for (SuperObject object : objects) {
+            if (object != null) {
+                object.update();
+            }
+        }
     }
     
     @Override 
@@ -89,6 +102,13 @@ public class GamePanel extends JPanel implements Runnable {
         Graphics2D g2 = (Graphics2D) g;
 
         tileManager.draw(g2);
+
+        for (SuperObject object : objects) {
+            if (object != null) {
+                object.draw(g2, this);
+            }
+        }
+
         player.draw(g2);
 
         g2.dispose();
@@ -152,5 +172,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     public CollisionChecker getCollisionChecker() {
         return collisionChecker;
+    }
+
+    public SuperObject[] getObjects() {
+        return objects;
     }
 }

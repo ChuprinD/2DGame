@@ -1,13 +1,11 @@
-package Entity;
+package Assets.Entity;
 
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
 
 public class Entity {
-    private int worldX;
-    private int worldY;
-    private int width;
-    private int height;
+    private int worldX, worldY;
+    private int width, height;
     private int speed;
     private String direction;
 
@@ -16,16 +14,33 @@ public class Entity {
     private int spriteCounter = 0;
 
     private Rectangle solidArea;
+    private int defaultSolidAreaX, defaultSolidAreaY;
     private boolean collisionOn = false;
 
-    public Entity(int x, int y, int width, int height, int speed, Rectangle solidArea) {
+    public Entity(int x, int y, int width, int height, int speed) {
         this.worldX = x;
         this.worldY = y;
         this.width = width;
         this.height = height;
         this.speed = speed;
         this.direction = "down";
+    }
+    
+    public void setSolidArea(Rectangle solidArea) {
         this.solidArea = solidArea;
+    }
+
+    public int getdefaultSolidAreaX() {
+        return defaultSolidAreaX;
+    }
+
+    public int getdefaultSolidAreaY() {
+        return defaultSolidAreaY;
+    }
+    
+    public void setdefaultSolidArea(int x, int y) {
+        defaultSolidAreaX = x;
+        defaultSolidAreaY = y;
     }
 
     public void setMoveSpriteSheet(BufferedImage moveSpriteSheet) {
@@ -110,5 +125,13 @@ public class Entity {
 
     public boolean isCollisionOn() {
         return collisionOn;
+    }
+
+    public int getDefaultSolidAreaX() {
+        return defaultSolidAreaX;
+    }
+
+    public int getDefaultSolidAreaY() {
+        return defaultSolidAreaY;
     }
 }
