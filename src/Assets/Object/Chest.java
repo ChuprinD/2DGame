@@ -56,4 +56,8 @@ public class Chest extends SuperObject {
             }
         }
     }
+
+    public boolean isOpen() {
+        return isOpen;
+    }
 }

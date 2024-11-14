@@ -102,17 +102,27 @@ public class Player extends Entity {
     public void pickUpObject(int objectIndex) {
         if (objectIndex != -1) {
             String objectName = gamePanel.getObjects()[objectIndex].getName();
+            boolean isInteractPressed = keyH.isInteractPressed();
 
             switch (objectName) {
                 case "key":
                     hasKey++;
                     gamePanel.getObjects()[objectIndex] = null;
+                    gamePanel.getUIVariable().showMessage("You picked up a key");
                     break;
             
                 case "chest":
-                    if (hasKey > 0 && keyH.isInteractPressed()) {
-                        hasKey--;
-                        ((Chest) gamePanel.getObjects()[objectIndex]).openChest();
+                    boolean isOpen = ((Chest) gamePanel.getObjects()[objectIndex]).isOpen();
+                    if (isInteractPressed) {
+                        if (!isOpen && hasKey > 0) {
+                            hasKey--;
+                            ((Chest) gamePanel.getObjects()[objectIndex]).openChest();
+                            gamePanel.getUIVariable().showMessage("You opened the chest");
+                        } else if (isOpen) { 
+                            gamePanel.getUIVariable().showMessage("The chest is already opened");
+                        } else if (hasKey == 0) {
+                            gamePanel.getUIVariable().showMessage("You need a key to open the chest");
+                        }
                     }
                     break;
             }
@@ -184,5 +194,9 @@ public class Player extends Entity {
 
     public int getScreenY() {
         return screenY;
+    }
+
+    public int getNumberOfKeys() {
+        return hasKey;
     }
 }

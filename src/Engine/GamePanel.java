@@ -41,6 +41,8 @@ public class GamePanel extends JPanel implements Runnable {
 
     private SuperObject objects[] = new SuperObject[10];
 
+    private UI ui = new UI(this);
+
     public GamePanel() {
         this.setPreferredSize(new Dimension(screenWidth, screenHeight));
         this.setBackground(Color.BLACK);
@@ -111,6 +113,8 @@ public class GamePanel extends JPanel implements Runnable {
 
         player.draw(g2);
 
+        ui.draw(g2);
+
         g2.dispose();
     }
 
@@ -176,5 +180,9 @@ public class GamePanel extends JPanel implements Runnable {
 
     public SuperObject[] getObjects() {
         return objects;
+    }
+
+    public UI getUIVariable() {
+        return ui;
     }
 }

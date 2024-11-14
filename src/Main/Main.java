@@ -19,12 +19,12 @@ public class Main {
         window.pack();
 
         window.setLocationRelativeTo(null);
-        //window.setVisible(true);
+        window.setVisible(true);
 
-        //gamePanel.setupGame();
-        //gamePanel.startGameThread();
+        gamePanel.setupGame();
+        gamePanel.startGameThread();
 
-        MapEditor mapEditor = new MapEditor();
-        mapEditor.run();
+        //MapEditor mapEditor = new MapEditor();
+        //mapEditor.run();
     }
 }
